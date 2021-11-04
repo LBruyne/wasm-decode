@@ -3,7 +3,8 @@ package common
 import "errors"
 
 var (
-
 	ErrInvalidMagicNumber = errors.New("invalid magic number")
-	ErrInvalidVersion     = errors.New("invalid version header")
+	ErrInvalidVersion = errors.New("invalid version header")
+
+	ErrInvalidByte = errors.New("invalid byte")
 )

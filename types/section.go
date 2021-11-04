@@ -1,4 +1,4 @@
-package decode
+package types
 
 import (
 	"errors"
@@ -53,31 +53,29 @@ func (m *Module) readSection(r io.Reader) error {
 	// decode section according to its id
 	switch SectionID(b[0]) {
 	case SectionIDCustom:
-		// TODO
-		bb := make([]byte, ss)
-		_, err = io.ReadFull(r, bb)
+		err = m.readSectionCustom(r, ss)
 	case SectionIDType:
-		err = m.readSectionType(r)
+		err = m.readSectionType(r, ss)
 	case SectionIDImport:
-		err = m.readSectionImport(r)
+		err = m.readSectionImport(r, ss)
 	case SectionIDFunction:
-		err = m.readSectionFunction(r)
+		err = m.readSectionFunction(r, ss)
 	case SectionIDTable:
-		err = m.readSectionTable(r)
+		err = m.readSectionTable(r, ss)
 	case SectionIDMemory:
-		err = m.readSectionMemorie(r)
+		err = m.readSectionMemorie(r, ss)
 	case SectionIDGlobal:
-		err = m.readSectionGlobal(r)
+		err = m.readSectionGlobal(r, ss)
 	case SectionIDExport:
-		err = m.readSectionExport(r)
+		err = m.readSectionExport(r, ss)
 	case SectionIDStart:
-		err = m.readSectionStart(r)
+		err = m.readSectionStart(r, ss)
 	case SectionIDElement:
-		err = m.readSectionElement(r)
+		err = m.readSectionElement(r, ss)
 	case SectionIDCode:
-		err = m.readSectionCode(r)
+		err = m.readSectionCode(r, ss)
 	case SectionIDData:
-		err = m.readSectionData(r)
+		err = m.readSectionData(r, ss)
 	default:
 		err = errors.New("invalid section id")
 	}
@@ -88,7 +86,7 @@ func (m *Module) readSection(r io.Reader) error {
 	return nil
 }
 
-func (m *Module) readSectionType(r io.Reader) error {
+func (m *Module) readSectionType(r io.Reader, size uint32) error {
 	// get the vector size
 	vs, _, err := common.DecodeUint32(r)
 	if err != nil {
