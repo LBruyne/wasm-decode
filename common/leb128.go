@@ -21,13 +21,6 @@ var sevenBits = [...]byte{
 	0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f,
 }
 
-// ReadByte read one byte from io.Reader
-func ReadByte(r io.Reader) (byte, error) {
-	p := make([]byte, 1)
-	_, err := r.Read(p)
-	return p[0], err
-}
-
 // EncodeInt64 encode int64 to bytes
 func EncodeInt64(num int64) (b []byte) {
 	if num >= 0 && num <= 0x3f {
@@ -150,8 +143,36 @@ func DecodeInt32(r io.Reader) (ret int32, num uint64, err error) {
 	return
 }
 
+func DecodeInt64(r io.Reader) (ret int64, num uint64, err error) {
+	const (
+		int64Mask  int64 = 1 << 7
+		int64Mask2       = ^int64Mask
+		int64Mask3       = 1 << 6
+		int64Mask4       = ^0
+	)
+	var shift int
+	var b int64
+	for shift < 64 {
+		b, err = readByteAsInt64(r)
+		if err != nil {
+			return 0, 0, fmt.Errorf("readByte failed: %w", err)
+		}
+		num++
+		ret |= (b & int64Mask2) << shift
+		shift += 7
+		if b&int64Mask == 0 {
+			break
+		}
+	}
+
+	if shift < 64 && (b&int64Mask3) == int64Mask3 {
+		ret |= int64Mask4 << shift
+	}
+	return
+}
+
 func readByteAsUint32(r io.Reader) (uint32, error) {
-	readByte, err := ReadByte(r)
+	readByte, err := readByte(r)
 	return uint32(readByte), err
 }
 
@@ -162,11 +183,18 @@ func readByteAsInt32(r io.Reader) (int32, error) {
 }
 
 func readByteAsUint64(r io.Reader) (uint64, error) {
-	readByte, err := ReadByte(r)
+	readByte, err := readByte(r)
 	return uint64(readByte), err
 }
 
 func readByteAsInt64(r io.Reader) (int64, error) {
-	readByte, err := ReadByte(r)
+	readByte, err := readByte(r)
 	return int64(readByte), err
+}
+
+// readByte read one byte from io.Reader
+func readByte(r io.Reader) (byte, error) {
+	p := make([]byte, 1)
+	_, err := r.Read(p)
+	return p[0], err
 }

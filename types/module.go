@@ -9,24 +9,25 @@ import (
 
 // Module represent the wasm module
 type Module struct {
-	Version		 []byte
-	MagicNumber  []byte
+	Version     []byte
+	MagicNumber []byte
 
-	SecType      []*FunctionType
-	SecFunction  []uint32
-	SecTable     []*TableType
-	SecMemory    []*MemoryType
-	SecGlobals   []*GlobalSegment
-	SecElements  []*ElementSegment
-	SecData      []*DataSegment
-	SecStart     uint32
-	SecImport    []*ImportSegment
-	SecExport    map[string]*ExportSegment
-	SecCodes     []*CodeSegment
+	SecType     []*FunctionType
+	SecFunction []uint32
+	SecTable    []*TableType
+	SecMemory   []*MemoryType
+	SecGlobal   []*GlobalSegment
+	SecElement  []*ElementSegment
+	SecData     []*DataSegment
+	SecStart    interface{}
+	SecImport   []*ImportSegment
+	SecExport   []*ExportSegment
+	SecCode     []*CodeSegment
+	SecCustom   *CustomSec
 }
 
 // Decode decodes a wasm module from io.Reader which contains full bytecodes of .wasm file
-func (m *Module) Decode(r io.Reader) (error) {
+func (m *Module) Decode(r io.Reader) error {
 	// magic number
 	buf := make([]byte, 4)
 	if n, err := io.ReadFull(r, buf); err != nil || n != 4 {
@@ -56,5 +57,3 @@ func (m *Module) Decode(r io.Reader) (error) {
 	}
 	return nil
 }
-
-
