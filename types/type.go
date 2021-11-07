@@ -66,7 +66,7 @@ func readValueTypes(r io.Reader, s uint32) ([]ValueType, error) {
 		if err != nil {
 			return nil, fmt.Errorf("read %v-th value type: %w", i, err)
 		}
-		ret = append(ret, vt)
+		ret[i] = vt
 	}
 	return ret, nil
 }
@@ -131,7 +131,7 @@ func readFunctionType(r io.Reader) (*FunctionType, error) {
 
 type TableType struct {
 	ElemType byte
-	Limit    *LimitsType
+	Limit    *LimitType
 }
 
 func readTableType(r io.Reader) (*TableType, error) {
@@ -145,7 +145,7 @@ func readTableType(r io.Reader) (*TableType, error) {
 		return nil, fmt.Errorf("read element type: not be 0x70, which is defined by WASM 1.0")
 	}
 
-	l, err := readLimitsType(r)
+	l, err := readLimitType(r)
 	if err != nil {
 		return nil, fmt.Errorf("read limits type: %w", err)
 	}
@@ -156,19 +156,19 @@ func readTableType(r io.Reader) (*TableType, error) {
 	}, nil
 }
 
-type LimitsType struct {
+type LimitType struct {
 	Tag byte
 	Min uint32
 	Max uint32
 }
 
-func readLimitsType(r io.Reader) (*LimitsType, error) {
+func readLimitType(r io.Reader) (*LimitType, error) {
 	b, err := ReadByte(r)
 	if err != nil {
 		return nil, fmt.Errorf("read limits type tag: %w", err)
 	}
 
-	ret := &LimitsType{
+	ret := &LimitType{
 		Tag: b,
 	}
 	switch b {
@@ -225,10 +225,10 @@ func readGlobalType(r io.Reader) (*GlobalType, error) {
 	return ret, nil
 }
 
-type MemoryType = LimitsType
+type MemoryType = LimitType
 
 func readMemoryType(r io.Reader) (*MemoryType, error) {
-	return readLimitsType(r)
+	return readLimitType(r)
 }
 
 type LocalValueType struct {

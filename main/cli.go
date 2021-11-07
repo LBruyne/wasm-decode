@@ -1,8 +1,9 @@
-package cli
+package main
 
 import (
 	"flag"
 	"fmt"
+	"github.com/LBruyne/wasm-decode/cli"
 	"github.com/LBruyne/wasm-decode/decode"
 	"os"
 )
@@ -23,6 +24,6 @@ func main() {
 	}
 
 	if *dumpFlag {
-		dump(module)
+		cli.Dump(module)
 	}
 }
