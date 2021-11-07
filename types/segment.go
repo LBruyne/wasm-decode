@@ -140,8 +140,8 @@ func readDataSegment(r io.Reader) (*DataSegment, error) {
 		return nil, fmt.Errorf("read expr for offset: %w", err)
 	}
 
-	if expr.OptCode != operator.OptCodeI32Const {
-		return nil, fmt.Errorf("offset expression must be i32.const but get %#x", expr.OptCode)
+	if expr.OpCode != operator.OpCodeI32Const {
+		return nil, fmt.Errorf("offset expression must be i32.const but get %#x", expr.OpCode)
 	}
 
 	vs, _, err := common.DecodeUint32(r)
@@ -178,8 +178,8 @@ func readElementSegment(r io.Reader) (*ElementSegment, error) {
 		return nil, fmt.Errorf("read expr for offset: %w", err)
 	}
 
-	if expr.OptCode != operator.OptCodeI32Const {
-		return nil, fmt.Errorf("offset expression must be i32.const but get %#x", expr.OptCode)
+	if expr.OpCode != operator.OpCodeI32Const {
+		return nil, fmt.Errorf("offset expression must be i32.const but get %#x", expr.OpCode)
 	}
 
 	vs, _, err := common.DecodeUint32(r)
@@ -287,8 +287,8 @@ func readCodeSegment(r io.Reader) (*CodeSegment, error) {
 	if err != nil {
 		return nil, fmt.Errorf("read code body: %w", err)
 	}
-	if operator.OptCode(cb[len(cb)-1]) != operator.OptCodeEnd {
-		return nil, fmt.Errorf("read code body: invalid end optcode")
+	if operator.OpCode(cb[len(cb)-1]) != operator.OpCodeEnd {
+		return nil, fmt.Errorf("read code body: invalid end OpCode")
 	}
 
 	return &CodeSegment{

@@ -8,10 +8,10 @@ import (
 	"io"
 )
 
-// ConstExpression const expression defines the optcode must be xx.const instruction and data is the immediate
+// ConstExpression const expression defines the OpCode must be xx.const instruction and data is the immediate
 type ConstExpression struct {
-	OptCode operator.OptCode
-	Data    []byte
+	OpCode operator.OpCode
+	Data   []byte
 }
 
 type OffsetExpression = ConstExpression
@@ -30,23 +30,23 @@ func readConstExpression(r io.Reader) (*ConstExpression, error) {
 	b := make([]byte, 1)
 	_, err := io.ReadFull(r, b)
 	if err != nil {
-		return nil, fmt.Errorf("read optcode: %w", err)
+		return nil, fmt.Errorf("read OpCode: %w", err)
 	}
 
 	buf := new(bytes.Buffer)
 	teeR := io.TeeReader(r, buf)
 
-	optCode := operator.OptCode(b[0])
-	switch optCode {
-	case operator.OptCodeI32Const:
+	OpCode := operator.OpCode(b[0])
+	switch OpCode {
+	case operator.OpCodeI32Const:
 		_, _, err = common.DecodeInt32(teeR)
-	case operator.OptCodeI64Const:
+	case operator.OpCodeI64Const:
 		_, _, err = common.DecodeInt64(teeR)
-	case operator.OptCodeF32Const:
+	case operator.OpCodeF32Const:
 		_, err = ReadFloat32(teeR)
-	case operator.OptCodeF64Const:
+	case operator.OpCodeF64Const:
 		_, err = ReadFloat64(teeR)
-	case operator.OptCodeGlobalGet:
+	case operator.OpCodeGlobalGet:
 		_, _, err = common.DecodeUint32(teeR)
 	default:
 		return nil, fmt.Errorf("invalid byte for opt code: %#x", b[0])
@@ -57,15 +57,15 @@ func readConstExpression(r io.Reader) (*ConstExpression, error) {
 	}
 
 	if _, err := io.ReadFull(r, b); err != nil {
-		return nil, fmt.Errorf("look for end optcode: %w", err)
+		return nil, fmt.Errorf("look for end OpCode: %w", err)
 	}
 
-	if b[0] != byte(operator.OptCodeEnd) {
+	if b[0] != byte(operator.OpCodeEnd) {
 		return nil, fmt.Errorf("constant expression has not terminated")
 	}
 
 	return &ConstExpression{
-		OptCode: optCode,
-		Data:    buf.Bytes(),
+		OpCode: OpCode,
+		Data:   buf.Bytes(),
 	}, nil
 }
