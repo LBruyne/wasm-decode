@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	fileName = "../examples/wasm/setHash-call.wasm"
+	fileName = "../examples/wasm/test.wasm"
 )
 
 func TestDump(t *testing.T) {
@@ -15,5 +15,6 @@ func TestDump(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, mod)
 
-	Dump(mod)
+	d := NewDumper(mod)
+	d.Dump()
 }

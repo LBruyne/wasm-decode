@@ -13,9 +13,13 @@ type Dumper struct {
 	importedGlobalCount int
 }
 
-func Dump(module *types.Module) {
-	d := &Dumper{module: module}
+func NewDumper(module *types.Module) *Dumper {
+	return &Dumper{
+		module: module,
+	}
+}
 
+func (d *Dumper) Dump() {
 	fmt.Printf("Version: 0x%02x\n", d.module.Version)
 	d.dumpTypeSection()
 	d.dumpImportSection()

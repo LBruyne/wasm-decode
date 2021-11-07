@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	fileName = "../examples/wasm/setHash-call.wasm"
+	fileName = "../examples/wasm/test.wasm"
 )
 
 func TestDecodeFile(t *testing.T) {
